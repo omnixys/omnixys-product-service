@@ -23,7 +23,7 @@ class Env(BaseSettings):
     MONGO_DB_URI: str
     MONGO_DB_DATABASE: str
     EXPORT_FORMAT: str
-    ZIPKIN_URL: str
+    KEYS_PATH: str
 
     class Config:
         env_file = ".env"  # Stellen Sie sicher, dass dies auf Ihre .env-Datei verweist
