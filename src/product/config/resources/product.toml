@@ -1,0 +1,41 @@
+# TOML = Tom's Obvious, Minimal Language
+# Tom Preston-Werner https://tom.preston-werner.com, Mitgruender von GitHub
+# Erstes Release im Maerz 2013
+
+[product.server]
+# asgi = "uvicorn"
+asgi = "hypercorn"
+# host-binding = "0.0.0.0"
+port = 7301
+
+[product.dev]
+# z.B. DB neu laden
+enabled = true
+
+[product.excel]
+enabled = true
+
+[product.graphql]
+# locust: auskommentieren
+graphiql-enabled = true
+
+[product.jwt]
+# algorithm = "RS256"
+# private-key = "private-key.pem"
+# public-key = "public-key.pem"
+# issuer = "https://hka.de/JuergenZimmermann"
+
+[product.smtp]
+enabled = false
+host = "localhost"
+# host = "fakesmtp"
+port = 8025
+# timeout = 1.0
+
+[product.tls]
+# key = "key.pem"
+# certificate = "certificate.crt"
+
+[mongodb]
+uri = "mongodb://localhost:27017"
+database = "product"

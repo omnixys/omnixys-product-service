@@ -1,0 +1,109 @@
+[project]
+name = "product"
+version = "2025.04.01"
+description = "Product Microservice mit FastAPI, MongoDB, Keycloak, Kafka, GraphQL"
+readme = "README.md"
+authors = [{ name = "Caleb Gyamfi", email = "caleb-script@outlook.de" }]
+maintainers = [{ name = "Caleb Gyamfi", email = "caleb-script@outlook.de" }]
+requires-python = ">=3.13"
+
+dependencies = [
+     # --- Kafka ---
+    "aiokafka",                        # Kafka Client
+    "orjson",                          # Schnellere JSON bib
+
+    # --- Web & Core ---
+    "beanie",                          # ODM für MongoDB mit Pydantic-Unterstützung
+    "fastapi[standard]",
+    "motor",                           # MongoDB async Treiber
+    "python-dotenv",                    # .env-Verwaltung
+    "pydantic-settings",            # Settings mit Pydantic v2
+
+    # --- GraphQL (falls benötigt) ---
+    "strawberry-graphql[federation]>=0.262.5",   # GraphQL Server
+
+    # --- Auth ---
+    "python-jose[cryptography]>=3.3.0",    # JWT Verifikation
+    "python-keycloak",                     # Keycloak Auth
+
+    # --- Observability ---
+    "loguru>=0.7.3",
+    "opentelemetry-api>=1.14.0",
+    "opentelemetry-exporter-otlp",   # OTLP Export zu Tempo
+    "opentelemetry-exporter-prometheus", # Prometheus Export
+    "opentelemetry-instrumentation-fastapi>=0.46b0",
+    "opentelemetry-instrumentation-pymongo",
+    "opentelemetry-sdk>=1.14.0",
+    "prometheus-fastapi-instrumentator",
+
+    # "httpx",                           # Async HTTP Client
+    "hypercorn>=0.17.3",              # ASGI Server
+    "loguru>=0.7.3",
+    "openpyxl>=3.1.5",                # Excel-Export
+    "pillow",                          # Image Support für Excel-Export
+    "pyfiglet>=1.0.2",
+    "tabulate>=0.9.0",
+    "uvicorn>=0.22.0",
+]
+
+[project.scripts]
+product = "product:main"
+product-dev = "product.dev_server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.urls]
+homepage = "https://www.gentlecorp-systems.com"
+documentation = "https://readthedocs.org"
+repository = "https://github.com/gentlecorp/product"
+changelog = "https://github.com/gentlecorp/product/blob/main/CHANGELOG.md"
+
+[dependency-groups]
+build = ["hatch", "hatchling"]
+
+dev = [
+  "pytest",
+  "pytest-asyncio",
+  "pytest-html",
+  "requests",
+  "locust",
+  "watchfiles",     # für den Dev‑Reload
+]
+
+doc = [
+  "mkdocs",
+  "mkdocs-material",
+  "mkdocs-material-extensions",
+  "mkdocstrings[python]",
+  "mkdocstrings-python",
+  "griffe",
+  "mistune",
+]
+
+lint = [
+  "ruff",
+  "safety",
+  "vulture",
+  "types-tabulate",
+]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/product"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/product"]
+
+[tool.uv]
+default-groups = "all"
+
+
+# [tool.deptry]
+# ignore_obsolete = ["src/__init__.py"]
+# exclude = ["tests", "docs"]
+
+# [vulture]
+# min_confidence = 80
+# ignore_names = ["app", "router", "BaseModel"]
+# exclude = ["tests", "docs"]

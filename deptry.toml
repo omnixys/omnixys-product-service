@@ -1,0 +1,6 @@
+[tool.deptry]
+# ignore_missing = ["pytest", "locust", "mkdocs", "ruff", "vulture", "deptry"]
+# ignore_unused = ["pydantic[email]", "python-jose[cryptography]"]
+# exclude = ["tests", "docs", ".extras"]
+# ignore_notebooks = true
+# ignore_obsolete = ["uvicorn"]  # Optional, falls es gewollt ist
