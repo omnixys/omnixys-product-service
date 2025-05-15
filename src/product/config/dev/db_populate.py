@@ -90,12 +90,54 @@ async def mongo_populate() -> None:
             created_at=datetime.utcnow(),
             updated_at=datetime.utcnow(),
         ),
+        Product(
+            id=UUID("12000000-0000-0000-0000-000000000006"),
+            name="Bluetooth Kopfhörer",
+            brand="SoundMax",
+            price=to_decimal("89.99"),
+            description="Kabellose Bluetooth-Kopfhörer mit aktiver Geräuschunterdrückung",
+            category=ProductCategory.ELEKTRONIK,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
+        ),
+        Product(
+            id=UUID("12000000-0000-0000-0000-000000000007"),
+            name="Gaming-Maus",
+            brand="ProGamer",
+            price=to_decimal("59.99"),
+            description="Ergonomische Gaming-Maus mit RGB-Beleuchtung",
+            category=ProductCategory.ELEKTRONIK,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
+        ),
+        Product(
+            id=UUID("12000000-0000-0000-0000-000000000008"),
+            name="USB-C Ladegerät",
+            brand="FastCharge",
+            price=to_decimal("24.99"),
+            description="Schnellladegerät mit USB-C Anschluss",
+            category=ProductCategory.ELEKTRONIK,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
+        ),
+        Product(
+            id=UUID("12000000-0000-0000-0000-000000000009"),
+            name="Webcam Full HD",
+            brand="StreamCam",
+            price=to_decimal("79.99"),
+            description="1080p Webcam mit Mikrofon für Videokonferenzen",
+            category=ProductCategory.ELEKTRONIK,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
+        ),
     ]
 
     for item in sample_products:
         await item.insert()
 
+    # 10. Produkt mit Varianten
     product = Product(
+        id=UUID("02000000-0000-0000-0000-000000000003"),
         name="iPhone 15",
         brand="Apple",
         price=to_decimal("1199.99"),

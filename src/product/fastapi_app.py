@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Final
 
-from fastapi import FastAPI, Request, Response, status
+from fastapi import FastAPI, HTTPException, Request, Response, status
 from fastapi.responses import FileResponse
 from loguru import logger
 
@@ -120,14 +120,47 @@ app.include_router(graphql_router, prefix="/graphql")
 
 @app.middleware("http")
 async def inject_keycloak(request: Request, call_next):
-    request.state.keycloak = await KeycloakService.create(request)
-    response = await call_next(request)
-    return response
+    # Sonderfall: Introspection oder kein Token
+    try:
+        body = await request.body()
+        if b"__schema" in body or b"__introspection" in body:
+            request.state.keycloak = None
+            return await call_next(request)
+    except Exception:
+        request.state.keycloak = None
+        return await call_next(request)
+
+    # Normale Authentifizierung
+    try:
+        request.state.keycloak = await KeycloakService.create(request)
+    except HTTPException as e:
+        logger.warning("Keycloak Token-Fehler: {}", e.detail)
+        request.state.keycloak = None  # sicherstellen, dass Attribut gesetzt ist
+
+    return await call_next(request)
 
 
 # --------------------------------------------------------------------------------------
 # E x c e p t i o n   H a n d l e r
 # --------------------------------------------------------------------------------------
+@app.exception_handler(HTTPException)
+def http_exception_handler(request: Request, exc: HTTPException) -> Response:
+    """Generischer HTTPException-Handler mit speziellem Fokus auf 401 Unauthorized."""
+
+    if exc.status_code == status.HTTP_401_UNAUTHORIZED:
+        return Response(
+            content="Authentication required: Bitte gültigen Token mitsenden.",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            media_type=TEXT_PLAIN,
+        )
+
+    # Fallback für andere HTTP-Fehler
+    return Response(
+        content=exc.detail if exc.detail else "Ein Fehler ist aufgetreten.",
+        status_code=exc.status_code,
+        media_type=TEXT_PLAIN,
+    )
+    
 @app.exception_handler(NotFoundError)
 def not_found_error_handler(_request: Request, _err: NotFoundError) -> Response:
     """Errorhandler für NotFoundError.

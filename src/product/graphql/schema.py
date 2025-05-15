@@ -10,6 +10,7 @@ from product.dependency_provider import (
     get_product_mutation_resolver,
     get_product_query_resolver,
 )
+from product.error.exceptions import AuthenticationError
 from product.model.entity.product import ProductInput, ProductType
 from product.model.entity.product_variant import ProductVariantInput
 from product.model.input.pagination import PaginationInput
@@ -27,8 +28,7 @@ from product.security.keycloak_service import KeycloakService
 async def get_context(request: Request) -> dict:
     return {
         "request": request,
-        # "keycloak": KeycloakService(request),
-        "keycloak": request.state.keycloak,  # ✅ statt KeycloakService(request)
+        "keycloak": getattr(request.state, "keycloak", None),
     }
 
 
@@ -43,6 +43,11 @@ class Query:
         id: strawberry.ID,
         info: strawberry.types.Info = None,
     ) -> ProductType | None:
+        keycloak: KeycloakService | None = info.context.get("keycloak")
+        if keycloak is None:
+            raise AuthenticationError()
+        keycloak.assert_roles(["Admin", "User"])
+
         return await get_product_query_resolver().resolve_product(
             info, product_id=str(id)
         )
@@ -50,7 +55,7 @@ class Query:
     @strawberry.field
     async def products(
         self,
-        pagination: PaginationInput,
+        pagination: PaginationInput | None = None,
         search_criteria: ProductSearchCriteriaInput | None = None,
         info: strawberry.types.Info = None,
     ) -> ProductSlice:
@@ -62,6 +67,13 @@ class Query:
         :raises NotFoundError: Falls kein Patient gefunden wurde, wird zu GraphQLError
         """
 
+        keycloak: KeycloakService | None = info.context.get("keycloak")
+        if keycloak is None:
+            raise AuthenticationError()
+        keycloak.assert_roles(["Admin", "User"])
+
+        if pagination is None:
+            pagination = PaginationInput(skip=0, limit=10)
         pageable = Pageable.create(skip=pagination.skip, limit=pagination.limit)
 
         # 💡 SearchCriteriaInput → SearchCriteria (DTO) umwandeln
@@ -106,6 +118,11 @@ class Mutation:
         input: List[ProductVariantInput],
         info: strawberry.types.Info,
     ) -> CreatePayload:
+        keycloak: KeycloakService | None = info.context.get("keycloak")
+        if keycloak is None:
+            raise AuthenticationError()
+        keycloak.assert_roles(["Admin", "User"])
+
         return await get_product_mutation_resolver().add_variant(
             product_id, input, info
         )
@@ -117,6 +134,11 @@ class Mutation:
         paths: List[str],
         info: strawberry.types.Info,
     ) -> CreatePayload:
+        keycloak: KeycloakService | None = info.context.get("keycloak")
+        if keycloak is None:
+            raise AuthenticationError()
+        keycloak.assert_roles(["Admin", "User"])
+
         return await get_product_mutation_resolver().add_image_paths(
             product_id, paths, info
         )
@@ -128,6 +150,11 @@ class Mutation:
         input: ProductInput,
         info: strawberry.types.Info,
     ) -> CreatePayload:
+        keycloak: KeycloakService | None = info.context.get("keycloak")
+        if keycloak is None:
+            raise AuthenticationError()
+        keycloak.assert_roles(["Admin", "User"])
+
         return await get_product_mutation_resolver().update_product(
             product_id, input, info
         )
@@ -138,6 +165,11 @@ class Mutation:
         product_id: strawberry.ID,
         info: strawberry.types.Info,
     ) -> bool:
+        keycloak: KeycloakService | None = info.context.get("keycloak")
+        if keycloak is None:
+            raise AuthenticationError()
+        keycloak.assert_roles(["Admin", "User"])
+
         return await get_product_mutation_resolver().delete_product(product_id, info)
 
 
