@@ -32,6 +32,8 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from product.security.keycloak_service import KeycloakService
 
+from product.health.router import router as health_router
+
 from .banner import banner
 
 __all__ = [
@@ -86,7 +88,8 @@ Instrumentator().instrument(app).expose(app)  # Prometheus-Metriken
 # --------------------------------------------------------------------------------------
 # R E S T
 # --------------------------------------------------------------------------------------
-app.include_router(health_router, prefix="/health")
+app.include_router(health_router)
+# app.include_router(health_router, prefix="/health")
 app.include_router(shutdown_router, prefix="/admin")
 if dev:
     app.include_router(db_populate_router, prefix="/dev")
@@ -160,7 +163,7 @@ def http_exception_handler(request: Request, exc: HTTPException) -> Response:
         status_code=exc.status_code,
         media_type=TEXT_PLAIN,
     )
-    
+
 @app.exception_handler(NotFoundError)
 def not_found_error_handler(_request: Request, _err: NotFoundError) -> Response:
     """Errorhandler für NotFoundError.

@@ -1,0 +1,81 @@
+site_name: product
+
+nav:
+  - Start: index.md
+  - Use Cases: use-cases.md
+  - Komponentendiagramm: komponentendiagramm.md
+  - Schichtenarchitektur: schichtenarchitektur.md
+  - ER-Diagramm: er-diagramm.md
+  - API-Dokumentation:
+      - __init__: modules/__init__.md
+      - REST-Schnittstelle: modules/rest.md
+      - GraphQL-Schnittstelle: modules/graphql.md
+      - Geschäftslogik: modules/service.md
+      - Datenbankzugriffsschicht: modules/repository.md
+      - Geschäftsobjekte: modules/entity.md
+      - Authentifizierung und Autorisierung: modules/security.md
+
+theme:
+  name: material
+  favicon: img/favicon.ico
+  logo: img/logo.webp
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.path
+    - navigation.top
+    - toc.follow
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  language: de
+
+# site_dir: site
+
+markdown_extensions:
+  - toc:
+      permalink: true
+
+watch: [docs, mkdocs.yml, src/product]
+strict: true
+copyright: Copyright &copy; 2023 - present Jürgen Zimmermann, Hochschule Karlsruhe
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          src: src/product
+          options:
+            # default: google
+            docstring_style: sphinx
+            show_source: false
+            show_docstring_modules: true
+            show_docstring_classes: true
+            show_docstring_functions: true
+
+  - build_plantuml:
+      render: "server"
+      server: "http://www.plantuml.com/plantuml" # official plantuml server # DevSkim: ignore DS137138
+      disable_ssl_certificate_validation: true # for self-signed and invalid certs
+      output_format: "svg"
+      diagram_root: "docs/diagramme"
+      output_folder: "out"
+      input_folder: "src"
+      input_extensions: "plantuml"

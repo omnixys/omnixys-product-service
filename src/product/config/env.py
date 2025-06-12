@@ -14,8 +14,6 @@ class Env(BaseSettings):
     KC_SERVICE_PORT: str
     KC_SERVICE_REALM: str
     KC_SERVICE_CLIENT_ID: str
-    KC_SERVICE_SECRET: str
-    CLIENT_SECRET: str
     APP_ENV: str
     EXCEL_EXPORT_ENABLED: str
     MONGO_DB_USER_NAME: str
@@ -24,6 +22,8 @@ class Env(BaseSettings):
     MONGO_DB_DATABASE: str
     EXPORT_FORMAT: str
     KEYS_PATH: str
+    KAFKA_URI: str
+    TEMPO_URI: str
 
     class Config:
         env_file = ".env"  # Stellen Sie sicher, dass dies auf Ihre .env-Datei verweist

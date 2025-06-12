@@ -8,57 +8,54 @@ maintainers = [{ name = "Caleb Gyamfi", email = "caleb-script@outlook.de" }]
 requires-python = ">=3.13"
 
 dependencies = [
-     # --- Kafka ---
-    "aiokafka",                        # Kafka Client
-    "orjson",                          # Schnellere JSON bib
-
+    # --- Kafka ---
+    "aiokafka", # Kafka Client
+    "orjson", # Schnellere JSON bib
     # --- Web & Core ---
-    "beanie",                          # ODM für MongoDB mit Pydantic-Unterstützung
+    "beanie", # ODM für MongoDB mit Pydantic-Unterstützung
     "fastapi[standard]",
-    "motor",                           # MongoDB async Treiber
-    "python-dotenv",                    # .env-Verwaltung
-    "pydantic-settings",            # Settings mit Pydantic v2
-
+    "motor", # MongoDB async Treiber
+    "python-dotenv", # .env-Verwaltung
+    "pydantic-settings", # Settings mit Pydantic v2
     # --- GraphQL (falls benötigt) ---
-    "strawberry-graphql[federation]>=0.262.5",   # GraphQL Server
-
+    "strawberry-graphql[federation]>=0.262.5", # GraphQL Server
     # --- Auth ---
-    "python-jose[cryptography]>=3.3.0",    # JWT Verifikation
-    "python-keycloak",                     # Keycloak Auth
-
+    "python-jose[cryptography]>=3.3.0", # JWT Verifikation
+    "python-keycloak", # Keycloak Auth
     # --- Observability ---
     "loguru>=0.7.3",
     "opentelemetry-api>=1.14.0",
-    "opentelemetry-exporter-otlp",   # OTLP Export zu Tempo
+    "opentelemetry-exporter-otlp", # OTLP Export zu Tempo
     "opentelemetry-exporter-prometheus", # Prometheus Export
     "opentelemetry-instrumentation-fastapi>=0.46b0",
     "opentelemetry-instrumentation-pymongo",
     "opentelemetry-sdk>=1.14.0",
     "prometheus-fastapi-instrumentator",
-
     # "httpx",                           # Async HTTP Client
-    "hypercorn>=0.17.3",              # ASGI Server
+    "hypercorn>=0.17.3", # ASGI Server
     "loguru>=0.7.3",
-    "openpyxl>=3.1.5",                # Excel-Export
-    "pillow",                          # Image Support für Excel-Export
+    "openpyxl>=3.1.5", # Excel-Export
+    "pillow", # Image Support für Excel-Export
     "pyfiglet>=1.0.2",
     "tabulate>=0.9.0",
     "uvicorn>=0.22.0",
+    "aiohttp>=3.12.4",
 ]
 
 [project.scripts]
 product = "product:main"
 product-dev = "product.dev_server:main"
+doc = "mkdocs.__main__:cli"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project.urls]
-homepage = "https://www.gentlecorp-systems.com"
+homepage = "https://www.omnixys-systems.com"
 documentation = "https://readthedocs.org"
-repository = "https://github.com/gentlecorp/product"
-changelog = "https://github.com/gentlecorp/product/blob/main/CHANGELOG.md"
+repository = "https://github.com/omnixys/product"
+changelog = "https://github.com/omnixys/product/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 build = ["hatch", "hatchling"]
@@ -69,7 +66,14 @@ dev = [
   "pytest-html",
   "requests",
   "locust",
-  "watchfiles",     # für den Dev‑Reload
+  "watchfiles", # für den Dev‑Reload
+  "mkdocstrings[python]>=0.29.1",
+  "mkdocs-build-plantuml-plugin>=1.11.0",
+  "mkdocs>=1.6.1",
+  "mkdocs-material>=9.6.11",
+  "mkdocs-material-extensions>=1.3.1",
+  "mkdocs-get-deps>=0.2.0",
+  "ghp-import>=2.1.0",
 ]
 
 doc = [

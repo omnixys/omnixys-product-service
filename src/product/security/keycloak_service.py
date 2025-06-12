@@ -5,6 +5,8 @@ import os
 import httpx
 from loguru import logger
 
+from product.config import env
+
 
 class KeycloakService:
     """
@@ -77,9 +79,9 @@ class KeycloakService:
         """
         Dekodiert und verifiziert das JWT mithilfe der JWKS von Keycloak.
         """
-        realm = os.getenv("KC_SERVICE_REALM", "gentlecorp")
-        host = os.getenv("KC_SERVICE_HOST", "localhost")
-        port = os.getenv("KC_SERVICE_PORT", "18080")
+        realm = env.KC_SERVICE_REALM
+        host = env.KC_SERVICE_HOST
+        port = env.KC_SERVICE_PORT
 
         jwks_url = (
             f"http://{host}:{port}/auth/realms/{realm}/protocol/openid-connect/certs"
@@ -125,18 +127,21 @@ class KeycloakService:
         """
         Gibt alle Rollen aus dem realm_access des Tokens zurück.
         """
+        print(f"rollen: {self.payload.get("realm_access", {}).get("roles", [])}")
         return self.payload.get("realm_access", {}).get("roles", [])
 
     def has_role(self, required_roles: List[str]) -> bool:
         """
         Prüft, ob eine der erforderlichen Rollen vorhanden ist.
         """
+
         return any(role in self.get_roles() for role in required_roles)
 
     def assert_roles(self, required_roles: List[str]) -> None:
         """
         Wirft einen Fehler, wenn keine der erforderlichen Rollen vorhanden ist.
         """
+
         if not self.has_role(required_roles):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
