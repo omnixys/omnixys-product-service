@@ -134,6 +134,7 @@ jobs:
           mkdir -p reports
           echo "${{ steps.docker-scout-quickview.outputs.quickview }}" > reports/docker-scout-quickview.md
           echo "${{ steps.docker-scout-cves.outputs.cves }}" > reports/docker-scout-cves.md
+        continue-on-error: true
 
       - name: Upload Docker Scout Reports
         uses: actions/upload-artifact@v4
