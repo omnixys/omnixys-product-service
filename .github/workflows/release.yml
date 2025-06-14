@@ -1,24 +1,38 @@
-name: Create GitHub Release
+name: Create GitHub Release – Omnixys Product Service
 
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release Version (z.B. v1.2.3)'
+        required: true
   push:
     tags:
-      - "v*"  # Läuft nur bei neuen Tags wie v1.0.0
+      - "v*"  # Trigger bei Tags wie v1.2.3
 
 jobs:
   release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda
+      - name: Create Git Tag (nur bei workflow_dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag ${{ github.event.inputs.version }}
+          git push origin ${{ github.event.inputs.version }}
+
+      - name: Create GitHub Release (bei Tag push)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          body: "Automatisch generiertes Release für ${{ github.ref_name }}"
+          body: "Automatisch generiertes Release für Tag `${{ github.ref_name }}`"
           draft: false
           prerelease: false
