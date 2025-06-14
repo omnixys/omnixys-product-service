@@ -32,20 +32,21 @@ jobs:
         run: |
           pip install uv
           uv venv .venv
-          source .venv/bin/activate
-          uv sync --all-groups
-          uv pip install safety pip-audit
+          .venv/bin/uv sync --all-groups
+          .venv/bin/uv pip install safety pip-audit
 
       - name: Run safety
         run: |
           mkdir -p reports
-          safety check --full-report --output json > reports/safety-report.json
-          jq '.' reports/safety-report.json > reports/safety-report-pretty.json || true
+          .venv/bin/safety check --full-report --output json > reports/safety-report.json
+          jq '.' reports/safety-report.json > reports/safety-report-pretty.json
+        continue-on-error: true
 
       - name: Run pip-audit
         run: |
-          pip-audit -f json -o reports/pip-audit-report.json
-          jq '.' reports/pip-audit-report.json > reports/pip-audit-report-pretty.json || true
+          .venv/bin/pip-audit -f json -o reports/pip-audit-report.json
+          jq '.' reports/pip-audit-report.json > reports/pip-audit-report-pretty.json
+        continue-on-error: true
 
       - name: Upload Python Security Reports
         uses: actions/upload-artifact@v4
@@ -72,8 +73,8 @@ jobs:
         run: |
           pip install uv
           uv venv .venv
-          source .venv/bin/activate
-          uv sync --all-groups
+          .venv/bin/uv sync --all-groups
+          .venv/bin/uv pip freeze > requirements.txt
 
       - name: Set up Snyk CLI
         uses: snyk/actions/setup@master
@@ -85,13 +86,15 @@ jobs:
 
       - name: Run Snyk Test (JSON)
         run: |
-          snyk test --file=requirements.txt --json-file-output=snyk-report.json || true
+          snyk test --file=requirements.txt --json-file-output=snyk-report.json
           mkdir -p reports
           npm install -g snyk-to-html
           snyk-to-html -i snyk-report.json -o reports/snyk-report.html
+        continue-on-error: true
 
       - name: Run Snyk IaC Test
-        run: snyk iac test --report || true
+        run: snyk iac test --report
+        continue-on-error: true
 
       - name: Upload Snyk Report
         uses: actions/upload-artifact@v4
@@ -128,11 +131,12 @@ jobs:
 
       - name: Save Docker Scout Reports
         run: |
-          echo "${{ steps.docker-scout-quickview.outputs.quickview }}" > docker-scout-quickview.md
-          echo "${{ steps.docker-scout-cves.outputs.cves }}" > docker-scout-cves.md
+          mkdir -p reports
+          echo "${{ steps.docker-scout-quickview.outputs.quickview }}" > reports/docker-scout-quickview.md
+          echo "${{ steps.docker-scout-cves.outputs.cves }}" > reports/docker-scout-cves.md
 
       - name: Upload Docker Scout Reports
         uses: actions/upload-artifact@v4
         with:
           name: docker-scout-reports
-          path: ./docker-scout-*.md
+          path: reports/
