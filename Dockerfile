@@ -8,7 +8,6 @@ ARG UV_VERSION=0.6.9
 # 🧱 Stage 1: Builder
 # ------------------------------------------------------------------------------
 FROM ghcr.io/astral-sh/uv:${UV_VERSION}-python${PYTHON_MAIN_VERSION}-bookworm-slim AS builder
-
 WORKDIR /opt/app
 
 ENV UV_COMPILE_BYTECODE=1 \
@@ -33,11 +32,26 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 FROM python:${PYTHON_VERSION}-slim-bookworm AS final
 WORKDIR /opt/app
 
-LABEL org.opencontainers.image.title="product" \
-      org.opencontainers.image.description="Appserver product mit Basis-Image Bookworm" \
-      org.opencontainers.image.version="2025.05.16" \
+ARG APP_NAME
+ARG APP_VERSION
+ARG CREATED
+ARG REVISION
+ARG PYTHON_MAIN_VERSION
+ARG PYTHON_VERSION=${PYTHON_MAIN_VERSION}.2
+ARG UV_VERSION=0.6.9
+
+LABEL org.opencontainers.image.title="omnixys-${APP_NAME}-service" \
+      org.opencontainers.image.description="Omnixys ${APP_NAME}-service – Python ${PYTHON_VERSION}, basiert auf Debian Bookworm, gebaut mit uv ${UV_VERSION}" \
+      org.opencontainers.image.version="${APP_VERSION}" \
       org.opencontainers.image.licenses="GPL-3.0-or-later" \
-      org.opencontainers.image.authors="caleb.gyamfi@omnixys.com"
+      org.opencontainers.image.vendor="omnixys" \
+      org.opencontainers.image.authors="caleb.gyamfi@omnixys.com" \
+      org.opencontainers.image.base.name="python:${PYTHON_VERSION}-slim-bookworm" \
+      org.opencontainers.image.url="https://github.com/omnixys/omnixys-${APP_NAME}-service" \
+      org.opencontainers.image.source="https://github.com/omnixys/omnixys-${APP_NAME}-service" \
+      org.opencontainers.image.created="${CREATED}" \
+      org.opencontainers.image.revision="${REVISION}" \
+      org.opencontainers.image.documentation="https://github.com/omnixys/omnixys-${APP_NAME}-service/blob/main/README.md"
 
 RUN set -eux; \
     apt-get update; \
@@ -56,4 +70,4 @@ ENV PATH="/opt/app/.venv/bin:$PATH"
 EXPOSE 8000
 STOPSIGNAL SIGINT
 
-CMD ["python", "-m", "product"]
+CMD ["python", "-m", "analytics"]
