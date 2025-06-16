@@ -9,7 +9,7 @@ permissions:
 
 env:
     COSIGN_EXPERIMENTAL: "true"
-    IMAGE_NAME: ${{ secrets.DOCKER_USER }}/${{ secrets.SERVICE }}
+    IMAGE_NAME: ${{ secrets.DOCKER_USER }}/${{ secrets.SERVICE }}-service
 
     ACTIVE_PROFILE: ${{ secrets.ACTIVE_PROFILE }}
     HTTPS: ${{ secrets.HTTPS }}
@@ -29,6 +29,11 @@ jobs:
     docker:
         name: 🐳 Docker Build & Push
         runs-on: ubuntu-latest
+        env:
+         CURRENT_DATE: ${{ vars.CURRENT_DATE }}
+        strategy:
+         matrix:
+          python-version: [3.13]
         if: github.actor == 'caleb-script' && github.event_name == 'push'
         steps:
             - name: Checkout Repository
@@ -101,19 +106,25 @@ jobs:
             - name: Build and Push Docker Image (Multi-Arch)
               uses: docker/build-push-action@v5
               with:
-                  context: .
-                  push: true
-                  platforms: linux/amd64,linux/arm64
-                  tags: |
-                      ${{ env.IMAGE_NAME }}:${{ vars.CURRENT_DATE }}
-                      ${{ env.IMAGE_NAME }}:latest
-                  cache-from: type=local,src=/tmp/.buildx-cache
-                  cache-to: type=local,dest=/tmp/.buildx-cache
+                context: .
+                push: true
+                platforms: linux/amd64,linux/arm64
+                tags: |
+                  ${{ env.IMAGE_NAME }}:${{ vars.CURRENT_DATE }}
+                  ${{ env.IMAGE_NAME }}:latest
+                build-args: |
+                  REVISION=${{ github.sha }}
+                  CREATED=${{ vars.CURRENT_DATE }}
+                  APP_VERSION=${{ vars.CURRENT_DATE }}
+                  APP_NAME=${{ secrets.SERVICE }}-service
+                  PYTHON_MAIN_VERSION=${{ matrix.python-version }}
+                cache-from: type=local,src=/tmp/.buildx-cache
+                cache-to: type=local,dest=/tmp/.buildx-cache
 
             - name: Install cosign
               uses: sigstore/cosign-installer@v3
 
             - name: Sign Docker Image with cosign (OIDC/GitHub)
               run: |
-                  cosign sign --yes ${{ env.IMAGE_NAME }}:${{ vars.CURRENT_DATE }}
-                  cosign sign --yes ${{ env.IMAGE_NAME }}:latest
+                  cosign sign --yes --recursive ${{ env.IMAGE_NAME }}:${{ env.CURRENT_DATE }}
+                  cosign sign --yes --recursive ${{ env.IMAGE_NAME }}:latest
