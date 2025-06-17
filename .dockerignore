@@ -26,3 +26,10 @@ mkdocs.yml
 openapi.json
 report.html
 sonar-*
+
+__pycache__/
+*.pyc
+.venv/
+.git/
+.DS_Store
+*.log
