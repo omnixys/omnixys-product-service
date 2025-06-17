@@ -65,6 +65,7 @@ RUN set -eux; \
 USER app
 COPY --from=builder --chown=app:app /opt/app ./
 ENV PATH="/opt/app/.venv/bin:$PATH"
+ENV APP_NAME=product
 
 EXPOSE 8000
 STOPSIGNAL SIGINT
@@ -72,6 +73,9 @@ STOPSIGNAL SIGINT
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
 CMD wget -qO- --spider http://localhost:8000/health | grep -q 'ok'
 
-ENTRYPOINT ["sh", "-c"]
-CMD ["python -m ${APP_NAME}"]
+ENTRYPOINT ["/bin/bash", "-c"]
+CMD ["exec python -m $APP_NAME"]
+
+
+
 
