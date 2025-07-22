@@ -27,7 +27,7 @@ jobs:
             uv venv .venv
             source .venv/bin/activate
             uv sync --all-groups
-            uv pip add safety pip-audit
+            uv add safety pip-audit
 
       - name: Run safety check
         run: |
